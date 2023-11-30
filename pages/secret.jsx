@@ -2,8 +2,13 @@ import Image from "next/image";
 import Head from "next/head";
 import styles from "../styles/Secret.module.css";
 import topSecret from "../public/top-secret.png";
+import { signOut, getSession } from "next-auth/react";
 
-function Secret() {
+function Secret({ session }) {
+  console.log("🚀 ~ file: secret.jsx:8 ~ Secret ~ session:", session);
+  const handleSignOut = () => {
+    signOut();
+  };
   return (
     <div className={styles.container}>
       <Head>
@@ -12,13 +17,33 @@ function Secret() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Image src={topSecret} alt="" width="320" height="120" />
-      <h1>Hello mr Doe</h1>
+      <Image
+        src={session.user?.image ?? topSecret}
+        alt=""
+        width="320"
+        height="320"
+      />
+      <h1>Hello mr {session.user?.name}</h1>
       <p>You are authorized to see this page</p>
 
-      <button>Sign Out</button>
+      <button onClick={handleSignOut}>Sign Out</button>
     </div>
   );
 }
+export const getServerSideProps = async (context) => {
+  // get the session
+  const session = await getSession(context);
 
+  // redirect the user if there is no session
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+
+  return { props: { session } };
+};
 export default Secret;

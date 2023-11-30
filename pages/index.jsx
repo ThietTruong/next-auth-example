@@ -3,8 +3,14 @@ import Image from "next/image";
 import styles from "../styles/Home.module.css";
 import googleSvg from "../public/google.svg";
 import githubSvg from "../public/github.svg";
+import { signIn } from "next-auth/react";
 
 export default function Home() {
+  const handleSignIn = (provider) => {
+    // the redirect url must be an absolute url!
+    const redirect = window.location.href + "/secret";
+    signIn(provider, { callbackUrl: redirect });
+  };
   return (
     <div className={styles.container}>
       <Head>
@@ -17,12 +23,12 @@ export default function Home() {
 
       {/* oauth */}
       {/* google */}
-      <button className={styles.oauth}>
+      <button className={styles.oauth} onClick={() => handleSignIn("google")}>
         <Image src={googleSvg} width="18" height="18" alt="" />
         <span>Sign up with Google</span>
       </button>
       {/* github */}
-      <button className={styles.oauth}>
+      <button className={styles.oauth} onClick={() => handleSignIn("github")}>
         <Image src={githubSvg} width="18" height="18" alt="" />
         <span>Sign up with Github</span>
       </button>
